@@ -15,11 +15,13 @@
   </head>
   <body class="login_body">
     <header>
-      <h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
+      <a href="index.html">
+        <h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
+      </a>
       <nav>
         <ul>
-          <li><a href="index.html">projets</a></li>
-          <li>contact</li>
+          <li><a href="index.html#portfolio">projets</a></li>
+          <li><a href="index.html#contact">contact</a></li>
           <li>login</li>
           <li><img src="./assets/icons/instagram.png" alt="Instagram" /></li>
         </ul>
@@ -27,16 +29,16 @@
     </header>
     <main class="login_section">
       <h2>Log in</h2>
-      <form action="post">
+      <form method="POST">
+        <h3 id="error"></h3>
         <label for="email">Email</label>
-        <input type="email" required />
+        <input type="email" name="email" required />
         <label for="passeword">Password</label>
-        <input type="password" name="password" id="" required />
-        <button type="submit">Se connecter</button>
+        <input type="password" name="password" required />
+        <button type="submit" id="submit">Se connecter</button>
         <button>Mot de passe oublié</button>
       </form>
     </main>
-
     <footer class="login_footer">
       <nav>
         <ul>

@@ -10,17 +10,23 @@
       href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Work+Sans&display=swap"
       rel="stylesheet"
     />
+    <script
+      src="https://kit.fontawesome.com/cd89535d02.js"
+      crossorigin="anonymous"
+    ></script>
     <meta name="description" content="" />
     <link rel="stylesheet" href="./assets/style.css" />
   </head>
   <body>
     <header>
-      <h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
+      <a href="index.html">
+        <h1>Sophie Bluel <span>Architecte d'inteérieur</span></h1>
+      </a>
       <nav>
         <ul>
-          <li>projets</li>
-          <li>contact</li>
-          <li><a href="login.html">login</a></li>
+          <li><a href="#portfolio">projets</a></li>
+          <li><a href="#contact">contact</a></li>
+          <li id="log"><a href="login.html">login</a></li>
           <li><img src="./assets/icons/instagram.png" alt="Instagram" /></li>
         </ul>
       </nav>
@@ -28,9 +34,19 @@
     <main>
       <section id="introduction">
         <figure>
-          <img src="./assets/images/sophie-bluel.png" alt="" />
+          <div>
+            <img src="./assets/images/sophie-bluel.png" alt="" />
+            <button id="edit_introduction" class="edit_btn">
+              <i class="fas fa-regular fa-pen-to-square fa-lg"></i>
+              modifier
+            </button>
+          </div>
         </figure>
         <article>
+          <button id="edit_introduction" class="edit_btn">
+            <i class="fas fa-regular fa-pen-to-square fa-lg"></i>
+            modifier
+          </button>
           <h2>Designer d'espace</h2>
           <p>
             Je raconte votre histoire, je valorise vos idées. Je vous accompagne
@@ -50,7 +66,13 @@
         </article>
       </section>
       <section id="portfolio">
-        <h2>Mes Projets</h2>
+        <h2>
+          Mes Projets
+          <button id="edit_introduction" class="edit_btn">
+            <i class="fas fa-regular fa-pen-to-square fa-lg"></i>
+            modifier
+          </button>
+        </h2>
         <div class="filters">
           <button id="Tout" class="filter active">Tout</button>
         </div>

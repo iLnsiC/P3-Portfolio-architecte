@@ -3,6 +3,7 @@
 const worksContainer = document.querySelector(".gallery");
 const works = worksContainer.children;
 const filtersSection = document.querySelector(".filters");
+const logBtn = document.querySelector("#log");
 const liveServerLink = "127.0.0.1:5500/BackEnd/";
 
 // main var declaration
@@ -58,7 +59,7 @@ function addFilterButtons() {
 // function to toggle works displays
 
 function toggleWorks() {
-  this.parentNode.querySelector('.active').classList.remove("active");
+  this.parentNode.querySelector(".active").classList.remove("active");
   this.classList.add("active");
   if (!this.dataset.categorieId) {
     for (i = 0; i < works.length; i++) {
@@ -75,16 +76,21 @@ function toggleWorks() {
 }
 
 async function init() {
+  const token = window.getItem("token");
+
   const res = await fetch("http://localhost:5678/api/works");
   const data = await res.json();
   await data.forEach((e) => {
     addWork(e.imageUrl, e.title, e.id, e.category.id, e.category.name);
   });
-  const categoriesId = addFilterButtons();
-  const filtersButtons = document.getElementsByClassName("filter");
-  console.log(filtersButtons);
-  for (i; i < filtersButtons.length; i++) {
-    filtersButtons[i].addEventListener("click", toggleWorks);
+  if (token) {
+  } else {
+    const categoriesId = addFilterButtons();
+    const filtersButtons = document.getElementsByClassName("filter");
+    console.log(filtersButtons);
+    for (i; i < filtersButtons.length; i++) {
+      filtersButtons[i].addEventListener("click", toggleWorks);
+    }
   }
 }
 
