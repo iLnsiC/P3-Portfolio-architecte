@@ -279,9 +279,7 @@ input {
 }
 
 footer {
-  position: absolute;
-  left: 0;
-  width: 100%;
+  padding: 5px 0;
 }
 footer,
 footer * {
@@ -376,10 +374,140 @@ footer nav ul {
   bottom: 0;
 }
 
-/*index loggeed*/
+/* index loggeed */
 .edit_btn {
   border: none;
   padding: 0 0 1.5rem;
   color: black;
   cursor: pointer;
+}
+#portfolio_title {
+  display: flex;
+  justify-content: center;
+  gap: 30px;
+}
+
+/* Modal */
+.modal {
+  position: absolute;
+  width: 50%;
+  left: 20%;
+  top: 100px;
+  border-radius: 10px;
+  z-index: 3;
+}
+.modal_wrapper {
+  position: relative;
+  width: 90%;
+  height: 100%;
+  padding: 5rem 5.5rem;
+  border-radius: 10px;
+}
+.modal .modal_icon_option {
+  position: absolute;
+  cursor: pointer;
+  top: 30px;
+  z-index: 4;
+  padding: 5px;
+  background-color: transparent;
+  border: none;
+}
+#previous_modal {
+  left: 30px;
+}
+#close_modal {
+  right: 30px;
+}
+.modal_wrapper,
+.modal_wrapper > *,
+.modal_wrapper > * > *,
+.modal_wrapper > * > * > * {
+  background-color: white;
+}
+.grey-bg {
+  position: absolute;
+  background-color: black;
+  z-index: 2;
+  opacity: 0.5;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+html,
+#portfolio,
+#introduction {
+  position: relative;
+}
+#modal_title {
+  font-size: 26px;
+  text-align: center;
+}
+#modal_body {
+  display: flex;
+  flex-wrap: wrap;
+  margin: 50px auto;
+  justify-content: space-between;
+}
+#modal_body .modal_picture {
+  position: relative;
+  width: calc(100% / 5 - 5px);
+  flex: none;
+}
+#modal_body .modal_icon_wrapper {
+  position: absolute;
+  background-color: transparent;
+  padding: 3px;
+  right: 0;
+}
+#modal_body .modal_picture .modal_icon {
+  cursor: pointer;
+  color: white;
+  padding: 4px;
+  border-radius: 3px;
+  margin-left: 3px;
+}
+#modal_body .modal_picture .modal_icon,
+#modal_body .modal_picture .modal_icon i {
+  cursor: pointer;
+  background-color: black;
+}
+#modal_body .modal_picture img {
+  margin-bottom: 0;
+  width: 100%;
+}
+#modal_body .modal_picture button {
+  padding: 10px 0;
+  border: none;
+}
+#modal_actions {
+  border-top: 1px solid #b3b3b3;
+}
+#modal_actions > * {
+  cursor: pointer;
+}
+#modal_actions .green_btn {
+  display: block;
+  font-family: "Syne";
+  font-weight: 700;
+  font-size: 14px;
+  text-decoration: none;
+  color: white;
+  background-color: #1d6154 !important;
+  margin: 3rem auto;
+  padding: 10px 50px;
+  text-align: center;
+  border: none;
+  border-radius: 60px;
+}
+#modal_actions .delete_btn {
+  display: block;
+  font-family: "Syne";
+  font-size: 14px;
+  text-decoration: none;
+  color: #d65353;
+  margin: auto;
+  text-align: center;
+  border: none;
+  border-radius: 60px;
 }
