@@ -94,10 +94,10 @@ function addEditButtons(id, el) {
 
 // modals function
 function openModal(title, figure, mainAction, deleteAction, previous, id) {
-  const blackBgTemplate = '<div class="grey-bg"></div>';
-  let closeModalButton;
+  const body = document.querySelector('body');
+  const blackBgTemplate = '<div class="grey-bg show"></div>';
   const modalTemplate = `
-    <div class="modal">
+    <div class="modal show">
       <div class="modal_wrapper">
         <button id="close_modal" class="modal_icon_option">
           <i class="fas fa-solid fa-xmark fa-2xl"></i>
@@ -114,27 +114,24 @@ function openModal(title, figure, mainAction, deleteAction, previous, id) {
       </div>
     </div>
   `;
-  document.body.innerHTML = document.body.innerHTML + blackBgTemplate;
-  const balckBg = document.querySelector(".grey-bg");
-
+  body.insertAdjacentHTML("beforeend", blackBgTemplate);
   switch (id) {
     case "edit_portfolio_title":
       document
         .querySelector("#portfolio")
         .insertAdjacentHTML("beforeend", modalTemplate);
-      closeModalButton = document.querySelector("#close_modal");
       break;
     case "edit_introduction_article":
-      closeModalButton = document.querySelector("#close_modal");
-
+      document
+      .querySelector("#introduction")
+      .insertAdjacentHTML("beforeend", modalTemplate);
       break;
     case "edit_introduction_img":
-      closeModalButton = document.querySelector("#close_modal");
-
+      document
+        .querySelector("#introduction")
+        .insertAdjacentHTML("beforeend", modalTemplate);
       break;
   }
-  closeModalButton.addEventListener("click", closeModal);
-  balckBg.addEventListener("click", closeModal);
 }
 
 function setUpModal(data, element) {
@@ -173,21 +170,56 @@ function setUpModal(data, element) {
         "Ajouter une photo",
         "Supprimer la galerie",
         "",
-        "edit_portfolio_title"
+        editTarget
       );
       break;
     case "edit_introduction_article":
+      const intorductionTitle = document.querySelector('#introduction_article').children['1'].textContent;
+      const introduction = document.querySelector('#introduction_article').children['2'].textContent;
+      figureTemplate = `
+        <form class='modal_introduction' action="POST" >
+          <input type="text" id="introduction_title" value=${intorductionTitle}>
+          <textarea id="story" name="story"
+            rows="5" cols="33">${introduction}
+          </textarea>
+        </form>
+      `
+      openModal(
+        "Changer l'introduction",
+        figureTemplate,
+        "Modifier",
+        "",
+        "",
+        editTarget
+      );
       break;
     case "edit_introduction_img":
+      figureTemplate = `
+      <form class="modal_profile_picture" action="POST">
+        <input type="file" name="picture" id="modal_profile_picture_input">
+        <div id="drop-zone">
+          Glissez la photo ici
+          <i class="fas fa-solid fa-file-arrow-up fa-2xl"></i>
+        </div>
+      </form>
+      `;
+      openModal(
+        "Changer la photo de profile",
+        figureTemplate,
+        "Modifier",
+        "",
+        "",
+        editTarget
+      );
       break;
   }
 }
 
 function closeModal() {
-  const balckBg = document.querySelector(".grey-bg");
+  const blackBg = document.querySelector(".grey-bg");
   const modal = document.querySelector(".modal");
   modal.remove();
-  balckBg.remove();
+  blackBg.remove();
 }
 
 async function init() {
@@ -203,20 +235,58 @@ async function init() {
     filtersButtons[i].addEventListener("click", toggleWorks);
   }
   if (token) {
+    // logOff 
+    let navLoginButton =  document.querySelector("#log");
+    navLoginButton.innerHTML = '<a>logoff</a>';
+    navLoginButton =  document.querySelector("#log");
+    navLoginButton.addEventListener("click", () => {
+      localStorage.removeItem("token");
+      window.location.replace("http://127.0.0.1:5500/FrontEnd/login.html");
+    })
+
+    // add edit button
     for (var i = 0; i < editBtnParents.length; i++) {
       let id = "edit_";
       id = id + editBtnParents[i].id;
       addEditButtons(id, editBtnParents[i]);
     }
+
+    // set up Modal for edits 
     const portfolioEditBtn = document.querySelector("#edit_portfolio_title");
     const introEditBtn = [
       document.querySelector("#edit_introduction_article"),
       document.querySelector("#edit_introduction_img"),
     ];
+    let modalIconClose;
+    let blackBg = document.querySelector(".grey-bg");
     portfolioEditBtn.addEventListener("click", function () {
       const element = this;
       setUpModal(data, element);
+      modalIconClose = document.querySelector("#close_modal");
+      blackBg = document.querySelector(".grey-bg");
+
+      blackBg.addEventListener('click', closeModal);
+      modalIconClose.addEventListener('click', closeModal);
     });
+    introEditBtn[0].addEventListener("click", function () {
+      const element = this;
+      setUpModal(data, element);
+      modalIconClose = document.querySelector("#close_modal");
+      blackBg = document.querySelector(".grey-bg");
+
+      blackBg.addEventListener('click', closeModal);
+      modalIconClose.addEventListener('click', closeModal);
+    });
+    introEditBtn[1].addEventListener("click", function () {
+      const element = this;
+      setUpModal(data, element);
+      modalIconClose = document.querySelector("#close_modal");
+      blackBg = document.querySelector(".grey-bg");
+
+      blackBg.addEventListener('click', closeModal);
+      modalIconClose.addEventListener('click', closeModal);
+    });
+    
   }
 }
 
