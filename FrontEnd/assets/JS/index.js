@@ -196,11 +196,11 @@ function setUpModal(data, element) {
     case "edit_introduction_img":
       figureTemplate = `
       <form class="modal_profile_picture" action="POST">
-        <input type="file" name="picture" id="modal_profile_picture_input">
-        <div id="drop-zone">
+        <label id="drop-zone">
           Glissez la photo ici
           <i class="fas fa-solid fa-file-arrow-up fa-2xl"></i>
-        </div>
+          <input id="modal_profile_picture_input" type="file" name="image" accept="image/png, image/jpg, image/jpeg">
+        </label>
       </form>
       `;
       openModal(
@@ -213,6 +213,10 @@ function setUpModal(data, element) {
       );
       break;
   }
+}
+
+function modalAction(){
+  console.log("work");
 }
 
 function closeModal() {
@@ -258,15 +262,18 @@ async function init() {
       document.querySelector("#edit_introduction_img"),
     ];
     let modalIconClose;
+    let modalActionBtn ;
     let blackBg = document.querySelector(".grey-bg");
     portfolioEditBtn.addEventListener("click", function () {
       const element = this;
       setUpModal(data, element);
       modalIconClose = document.querySelector("#close_modal");
       blackBg = document.querySelector(".grey-bg");
+      modalActionBtn = document.querySelector('.green_btn');
 
-      blackBg.addEventListener('click', closeModal);
       modalIconClose.addEventListener('click', closeModal);
+      blackBg.addEventListener('click', closeModal);
+      modalActionBtn.addEventListener('click', modalAction);
     });
     introEditBtn[0].addEventListener("click", function () {
       const element = this;
@@ -286,7 +293,6 @@ async function init() {
       blackBg.addEventListener('click', closeModal);
       modalIconClose.addEventListener('click', closeModal);
     });
-    
   }
 }
 
