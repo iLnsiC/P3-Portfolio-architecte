@@ -41,15 +41,30 @@
             ${previous}
             <h3 id="modal_title">${title}</h3>
             <div id="modal_body">
-              <form class='modal_introduction' action="POST" >
-                <input type="text" id="introduction_title" value=${introduction}>
-                <textarea id="story" name="story"
-                  rows="5" cols="33">${introduction}
-                </textarea>
+              <form id="${editActionPicture}_picture" class="edit_picture_form" action="POST">
+                <div id="drop_zone" class="modal_picture_input">
+                  <i class="fas fa-regular fa-image"></i>
+                  <label id="drop_label" >
+                    + Ajouter photo
+                    <input id="modal_profile_picture_input" type="file" name="image" accept="image/png, image/jpg, image/jpeg">
+                  </label>
+                  <div class="picture_condition">jpg, png, jpeg : 4mo max</div>
+                </div>
+                <label for="picture_title">
+                  Titre
+                  <input type="text" name="picture_title" class="modal_input">
+                </label>
+                <label for="picture_categorie">
+                  Catégorie
+                  <select name="pets" id="pet-select">
+                    <option value=""></option>
+                    <option value="${catOption}">${catOption}</option>
+                  </select>
+                </label>
               </form>
             </div>
             <div id="modal_actions">
-              <button class="green_btn">${mainAction}</button>
+              <button class="green_btn add_btn">${mainAction}</button>
               <button class="delete_btn">${deleteAction}</button>
             </div>
           </div>

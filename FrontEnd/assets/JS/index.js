@@ -108,7 +108,7 @@ function openModal(title, figure, mainAction, deleteAction, previous, id) {
           ${figure}
         </div>
         <div id="modal_actions">
-          <button class="green_btn">${mainAction}</button>
+          <button class="green_btn add_btn">${mainAction}</button>
           <button class="delete_btn">${deleteAction}</button>
         </div>
       </div>
@@ -160,7 +160,7 @@ function setUpModal(data, element) {
               </button>
             </div>
             <img src="${pictureLink}" alt="${workTitle}" />
-            <button>éditer</button>
+            <button class="single_edit_btn">éditer</button>
           </div>
         `;
       });
@@ -195,12 +195,13 @@ function setUpModal(data, element) {
       break;
     case "edit_introduction_img":
       figureTemplate = `
-      <form class="modal_profile_picture" action="POST">
-        <label id="drop-zone">
+      <form id="drop_zone" class="modal_profile_picture" action="POST">
+        <i class="fas fa-regular fa-image"></i>
+        <label id="drop_label" >
           Glissez la photo ici
-          <i class="fas fa-solid fa-file-arrow-up fa-2xl"></i>
           <input id="modal_profile_picture_input" type="file" name="image" accept="image/png, image/jpg, image/jpeg">
         </label>
+        <div class="picture_condition">jpg, png, jpeg : 4mo max</div>
       </form>
       `;
       openModal(
@@ -215,15 +216,45 @@ function setUpModal(data, element) {
   }
 }
 
-function modalAction(){
-  console.log("work");
-}
-
 function closeModal() {
   const blackBg = document.querySelector(".grey-bg");
   const modal = document.querySelector(".modal");
   modal.remove();
   blackBg.remove();
+}
+
+async function modalEdit(){
+  let catOptions = ``;
+  const res = await fetch("http://localhost:5678/api/categories");
+  const data = await res.json();
+  await data.forEach((e) => {
+    catOptions = `<option value="${e.id}">${e.name}</option>`;
+  });
+  const modalBody = document.querySelector("#modal_body");
+  const editTemplate = `
+    <form id="${editActionPicture}_picture" class="edit_picture_form" action="POST">
+      <div id="drop_zone" class="modal_picture_input">
+        <i class="fas fa-regular fa-image"></i>
+        <label id="drop_label" >
+          + Ajouter photo
+          <input id="modal_profile_picture_input" type="file" name="image" accept="image/png, image/jpg, image/jpeg">
+        </label>
+        <div class="picture_condition">jpg, png, jpeg : 4mo max</div>
+      </div>
+      <label for="picture_title">
+        Titre
+        <input type="text" name="picture_title" class="modal_input" value="${editPictureTitle}">
+      </label>
+      <label for="picture_categorie">
+        Catégorie
+        <select name="pets" id="pet-select">
+          <option value=""></option>
+          ${catOptions}
+        </select>
+      </label>
+    </form>
+  `;
+  modalBody.innerHTML = editTemplate;
 }
 
 async function init() {
@@ -269,11 +300,15 @@ async function init() {
       setUpModal(data, element);
       modalIconClose = document.querySelector("#close_modal");
       blackBg = document.querySelector(".grey-bg");
-      modalActionBtn = document.querySelector('.green_btn');
 
       modalIconClose.addEventListener('click', closeModal);
       blackBg.addEventListener('click', closeModal);
-      modalActionBtn.addEventListener('click', modalAction);
+
+      const editOptions = [
+        document.querySelector(".add_btn"),
+        document.querySelector(".delete_btn"),
+        document.querySelectorAll(".single_edit_btn"),
+      ]
     });
     introEditBtn[0].addEventListener("click", function () {
       const element = this;
