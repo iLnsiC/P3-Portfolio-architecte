@@ -17,7 +17,13 @@ async function onSubmit(event) {
   let result = await response.json();
 
   if (response.status === 200) {
+    const loginTime = new Date();
+    const logOffTime = loginTime.setTime(
+      loginTime.getTime() + 24 * 60 * 60 * 1000
+    );
     localStorage.setItem("token", result.token);
+    localStorage.setItem("loginTime", loginTime);
+    localStorage.setItem("logOffTime", logOffTime);
     // je choisi la methode replace() pour ne pas avoir la fenetre Login dans l'historique et eviter que le bouton precedent nous ramene a cette fenetre
     window.location.replace("http://127.0.0.1:5500/FrontEnd/index.html");
   } else if (response.status === 404 || response.status === 401) {

@@ -33,7 +33,7 @@
     </header>
     <main>
       <section id="introduction">
-        <div class="modal show">
+        <!-- <div class="modal show">
           <div class="modal_wrapper">
             <button id="close_modal" class="modal_icon_option">
               <i class="fas fa-solid fa-xmark fa-2xl"></i>
@@ -41,18 +41,28 @@
             ${previous}
             <h3 id="modal_title">${title}</h3>
             <div id="modal_body">
-              <form id="${editActionPicture}_picture" class="edit_picture_form" action="POST">
+              <form
+                id="${editActionPicture}_picture"
+                class="edit_picture_form"
+                action="POST"
+              >
                 <div id="drop_zone" class="modal_picture_input">
                   <i class="fas fa-regular fa-image"></i>
-                  <label id="drop_label" >
+                  <label id="drop_label">
                     + Ajouter photo
-                    <input id="modal_profile_picture_input" type="file" name="image" accept="image/png, image/jpg, image/jpeg">
+                    <input
+                      id="modal_profile_picture_input"
+                      type="file"
+                      name="image"
+                      accept="image/png, image/jpg, image/jpeg"
+                    />
                   </label>
                   <div class="picture_condition">jpg, png, jpeg : 4mo max</div>
+                  <img src="${preview_image}" alt="preview_image" class="preview_image">
                 </div>
                 <label for="picture_title">
                   Titre
-                  <input type="text" name="picture_title" class="modal_input">
+                  <input type="text" name="picture_title" class="modal_input" />
                 </label>
                 <label for="picture_categorie">
                   Catégorie
@@ -68,7 +78,7 @@
               <button class="delete_btn">${deleteAction}</button>
             </div>
           </div>
-        </div>
+        </div> -->
         <figure>
           <div id="introduction_img">
             <img src="./assets/images/sophie-bluel.png" alt="sophie-bluel" />
@@ -79,13 +89,13 @@
           <p>
             Je raconte votre histoire, je valorise vos idées. Je vous accompagne
             de la conception à la livraison finale du chantier.
-          <br><br>
+            <br /><br />
             Chaque projet sera étudié en commun, de façon à mettre en valeur les
             volumes, les matières et les couleurs dans le respect de l’esprit
             des lieux et le choix adapté des matériaux. Le suivi du chantier
             sera assuré dans le souci du détail, le respect du planning et du
             budget.
-          <br><br>
+            <br /><br />
             En cas de besoin, une équipe pluridisciplinaire peut-être constituée
             : architecte DPLG, décorateur(trice)
           </p>

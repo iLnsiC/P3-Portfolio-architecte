@@ -77,6 +77,43 @@ function toggleWorks() {
 
 // Usefull function after login
 
+// check login
+async function checkLogin() {
+  let nowTime = new Date();
+  nowTime = nowTime.getTime();
+  const logOffTime = localStorage.logOffTime;
+  const logOffMessageTemplate = `
+    <div class="modal show">
+      <div class="modal_wrapper">
+        <div id="modal_body">
+          <h3 class="logoff_Title">Votre session a expirer. <br>Vous allez etre rediriger vers la fenetre d'authentification dans un instant</h3>
+        </div>
+      </div>
+    </div>
+  `;
+  if (nowTime >= logOffTime) {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: "smooth",
+    });
+    document
+      .querySelector("body")
+      .insertAdjacentHTML("beforeend", logOffMessageTemplate);
+    setTimeout(function () {
+      localStorage.removeItem("token");
+      localStorage.removeItem("logOffTime");
+      window.location.replace("http://127.0.0.1:5500/FrontEnd/login.html");
+    }, 5000);
+  }
+}
+
+function loggOff() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("logOffTime");
+  window.location.replace("http://127.0.0.1:5500/FrontEnd/login.html");
+}
+
 // add edit button
 function addEditButtons(id, el) {
   const editBtnTemplate = `
@@ -94,13 +131,16 @@ function addEditButtons(id, el) {
 
 // modals function
 function openModal(title, figure, mainAction, deleteAction, previous, id) {
-  const body = document.querySelector('body');
+  const body = document.querySelector("body");
   const blackBgTemplate = '<div class="grey-bg show"></div>';
   const modalTemplate = `
     <div class="modal show">
       <div class="modal_wrapper">
         <button id="close_modal" class="modal_icon_option">
           <i class="fas fa-solid fa-xmark fa-2xl"></i>
+        </button>
+        <button id="previous_modal" class="modal_icon_option">
+          <i class="fas fa-solid fa-arrow-left fa-2xl"></i>
         </button>
         ${previous}
         <h3 id="modal_title">${title}</h3>
@@ -109,7 +149,7 @@ function openModal(title, figure, mainAction, deleteAction, previous, id) {
         </div>
         <div id="modal_actions">
           <button class="green_btn add_btn">${mainAction}</button>
-          <button class="delete_btn">${deleteAction}</button>
+          <button id='delete_all_btn' class="delete_btn">${deleteAction}</button>
         </div>
       </div>
     </div>
@@ -123,8 +163,8 @@ function openModal(title, figure, mainAction, deleteAction, previous, id) {
       break;
     case "edit_introduction_article":
       document
-      .querySelector("#introduction")
-      .insertAdjacentHTML("beforeend", modalTemplate);
+        .querySelector("#introduction")
+        .insertAdjacentHTML("beforeend", modalTemplate);
       break;
     case "edit_introduction_img":
       document
@@ -136,11 +176,6 @@ function openModal(title, figure, mainAction, deleteAction, previous, id) {
 
 function setUpModal(data, element) {
   let figureTemplate = ``;
-  const previousBtnTemplate = `
-    <button id="previous_modal" class="modal_icon_option">
-      <i class="fas fa-solid fa-arrow-left fa-2xl"></i>
-    </button>
-  `;
   const editTarget = element.id;
   switch (editTarget) {
     case "edit_portfolio_title":
@@ -152,10 +187,10 @@ function setUpModal(data, element) {
           `
           <div class='modal_picture'>
             <div class="modal_icon_wrapper">
-              <button id="modal_icon_move_btn" class="modal_icon">
+              <button id="modal_icon_move_btn-${e.id}" class="modal_icon_move_btn modal_icon">
                 <i class="fas fa-solid fa-up-down-left-right"></i>
               </button>
-              <button id="modal_icon_delete_btn" class="modal_icon">
+              <button id="modal_icon_delete_btn-${e.id}" class="modal_icon_delete_btn modal_icon">
                 <i class="fas fa-solid fa-trash-can"></i>
               </button>
             </div>
@@ -174,8 +209,10 @@ function setUpModal(data, element) {
       );
       break;
     case "edit_introduction_article":
-      const intorductionTitle = document.querySelector('#introduction_article').children['1'].textContent;
-      const introduction = document.querySelector('#introduction_article').children['2'].textContent;
+      const intorductionTitle = document.querySelector("#introduction_article")
+        .children["1"].textContent;
+      const introduction = document.querySelector("#introduction_article")
+        .children["2"].textContent;
       figureTemplate = `
         <form class='modal_introduction' action="POST" >
           <input type="text" id="introduction_title" value=${intorductionTitle}>
@@ -183,7 +220,7 @@ function setUpModal(data, element) {
             rows="5" cols="33">${introduction}
           </textarea>
         </form>
-      `
+      `;
       openModal(
         "Changer l'introduction",
         figureTemplate,
@@ -223,44 +260,144 @@ function closeModal() {
   blackBg.remove();
 }
 
-async function modalEdit(){
-  let catOptions = ``;
-  const res = await fetch("http://localhost:5678/api/categories");
-  const data = await res.json();
-  await data.forEach((e) => {
-    catOptions = `<option value="${e.id}">${e.name}</option>`;
-  });
-  const modalBody = document.querySelector("#modal_body");
-  const editTemplate = `
-    <form id="${editActionPicture}_picture" class="edit_picture_form" action="POST">
+async function addWorkModal(child, dataCat) {
+  const editActionPicture = "add_work";
+  let catId, catName;
+  let catOptions = `<option value=""></option>`;
+
+  for (let i = 0; i < dataCat.length; i++) {
+    catId = dataCat[i].id;
+    catName = dataCat[i].name;
+    catOptions = catOptions + `<option value="${catId}">${catName}</option>`;
+  }
+  const newBodyTemplate = `
+    <form
+      id="${editActionPicture}_picture"
+      class="edit_picture_form"
+      action="POST"
+      >
       <div id="drop_zone" class="modal_picture_input">
         <i class="fas fa-regular fa-image"></i>
-        <label id="drop_label" >
+        <label id="drop_label">
           + Ajouter photo
-          <input id="modal_profile_picture_input" type="file" name="image" accept="image/png, image/jpg, image/jpeg">
+          <input
+            id="modal_work_picture_input"
+            type="file"
+            name="image"
+            accept="image/png, image/jpg, image/jpeg"
+          />
         </label>
         <div class="picture_condition">jpg, png, jpeg : 4mo max</div>
       </div>
       <label for="picture_title">
         Titre
-        <input type="text" name="picture_title" class="modal_input" value="${editPictureTitle}">
+        <input type="text" name="title" class="modal_input" placeholder='nom de votre projet - la ville de votre projet'/>
       </label>
       <label for="picture_categorie">
         Catégorie
-        <select name="pets" id="pet-select">
-          <option value=""></option>
+        <select name="category" id="categories_select">
           ${catOptions}
         </select>
       </label>
     </form>
   `;
-  modalBody.innerHTML = editTemplate;
+  let submitAddBtn = `<button type='submit' class="green_btn submit_add_btn">Valider</button>`;
+  child[0].innerHTML = newBodyTemplate;
+  child[1].innerHTML = "Ajout photo";
+  child[2].innerHTML = submitAddBtn;
+  submitAddBtn = document.querySelector(".submit_add_btn");
+  submitAddBtn.addEventListener("click", postWork);
+}
+
+async function postWork(event) {
+  event.preventDefault();
+  const form = document.querySelector("form");
+  const bearerToken = localStorage.token;
+  let formData = new FormData(form);
+  console.log(form.image.files[0]);
+  form.addEventListener("change", () => {
+    const file = form.image.files[0];
+    console.log(file);
+    const preview = `<img src="${form.image.value}" alt="preview_image" class="preview_image">`;
+    if (file) {
+      document
+        .querySelector("#drop_zone")
+        .insertAdjacentHTML("beforeend", preview);
+    }
+  });
+  let response = await fetch("http://localhost:5678/api/works", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+    body: formData,
+  });
+  let result = await response.json();
+  console.log(result);
+}
+async function deleteWork(event, workIds) {
+  let response;
+  const bearerToken = localStorage.token;
+  console.log(workIds);
+  if (workIds) {
+    for (let i = 0; i < workIds.length; i++) {
+      response = await fetch(`http://localhost:5678/api/works/${workIds[i]}`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${bearerToken}`,
+        },
+      });
+    }
+  } else if (workIds === null){
+    const workId = event.target.id.split("-")[1];
+    response = await fetch(`http://localhost:5678/api/works/${workId}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${bearerToken}`,
+      },
+    });
+  }
+}
+
+async function editEvent(e, data, dataCat) {
+  await checkLogin();
+  console.log(data);
+  const workIds = data.map((e) => e.id);
+  setUpModal(data, e.target);
+  modalIconClose = document.querySelector("#close_modal");
+  blackBg = document.querySelector(".grey-bg");
+  deleteItem = document.querySelectorAll(".modal_icon_delete_btn");
+  deleteAll = document.querySelector("#delete_all_btn");
+  blackBg.addEventListener("click", closeModal);
+  modalIconClose.addEventListener("click", closeModal);
+  if (e.target.id === "edit_portfolio_title") {
+    const addBtn = document.querySelector(".add_btn");
+    const modalChild = [
+      document.querySelector("#modal_body"),
+      document.querySelector("#modal_title"),
+      document.querySelector("#modal_actions"),
+    ];
+    addBtn.addEventListener("click", function (event) {
+      addWorkModal(modalChild, dataCat);
+    });
+    deleteItem.forEach((e) => {
+      e.addEventListener("click", function (event) {
+        deleteWork(event, null);
+      });
+    });
+    deleteAll.addEventListener("click", function (event) {
+      deleteWork(event, workIds);
+    });
+  }
 }
 
 async function init() {
   const token = localStorage.getItem("token");
   const res = await fetch("http://localhost:5678/api/works");
   const data = await res.json();
+  const resCat = await fetch("http://localhost:5678/api/categories");
+  const dataCat = await resCat.json();
+  setTimeout(loggOff, 24 * 60 * 60 * 1000); //on peut rajouter une modal etes vous toujours la pour reset la connexion et le token
   await data.forEach((e) => {
     addWork(e.imageUrl, e.title, e.id, e.category.id, e.category.name);
   });
@@ -270,14 +407,11 @@ async function init() {
     filtersButtons[i].addEventListener("click", toggleWorks);
   }
   if (token) {
-    // logOff 
-    let navLoginButton =  document.querySelector("#log");
-    navLoginButton.innerHTML = '<a>logoff</a>';
-    navLoginButton =  document.querySelector("#log");
-    navLoginButton.addEventListener("click", () => {
-      localStorage.removeItem("token");
-      window.location.replace("http://127.0.0.1:5500/FrontEnd/login.html");
-    })
+    // logOff
+    let navLoginButton = document.querySelector("#log");
+    navLoginButton.innerHTML = "<a>logoff</a>";
+    navLoginButton = document.querySelector("#log");
+    navLoginButton.addEventListener("click", loggOff);
 
     // add edit button
     for (var i = 0; i < editBtnParents.length; i++) {
@@ -286,47 +420,23 @@ async function init() {
       addEditButtons(id, editBtnParents[i]);
     }
 
-    // set up Modal for edits 
+    // set up Modal for edits
     const portfolioEditBtn = document.querySelector("#edit_portfolio_title");
     const introEditBtn = [
       document.querySelector("#edit_introduction_article"),
       document.querySelector("#edit_introduction_img"),
     ];
     let modalIconClose;
-    let modalActionBtn ;
+    let modalActionBtn;
     let blackBg = document.querySelector(".grey-bg");
-    portfolioEditBtn.addEventListener("click", function () {
-      const element = this;
-      setUpModal(data, element);
-      modalIconClose = document.querySelector("#close_modal");
-      blackBg = document.querySelector(".grey-bg");
-
-      modalIconClose.addEventListener('click', closeModal);
-      blackBg.addEventListener('click', closeModal);
-
-      const editOptions = [
-        document.querySelector(".add_btn"),
-        document.querySelector(".delete_btn"),
-        document.querySelectorAll(".single_edit_btn"),
-      ]
+    portfolioEditBtn.addEventListener("click", function (event) {
+      editEvent(event, data, dataCat);
     });
-    introEditBtn[0].addEventListener("click", function () {
-      const element = this;
-      setUpModal(data, element);
-      modalIconClose = document.querySelector("#close_modal");
-      blackBg = document.querySelector(".grey-bg");
-
-      blackBg.addEventListener('click', closeModal);
-      modalIconClose.addEventListener('click', closeModal);
+    introEditBtn[0].addEventListener("click", function (event) {
+      editEvent(event, data);
     });
-    introEditBtn[1].addEventListener("click", function () {
-      const element = this;
-      setUpModal(data, element);
-      modalIconClose = document.querySelector("#close_modal");
-      blackBg = document.querySelector(".grey-bg");
-
-      blackBg.addEventListener('click', closeModal);
-      modalIconClose.addEventListener('click', closeModal);
+    introEditBtn[1].addEventListener("click", function (event) {
+      editEvent(event, data);
     });
   }
 }
