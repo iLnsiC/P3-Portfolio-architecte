@@ -285,28 +285,50 @@ async function addWorkModal(child, dataCat) {
             type="file"
             name="image"
             accept="image/png, image/jpg, image/jpeg"
+            required
           />
         </label>
         <div class="picture_condition">jpg, png, jpeg : 4mo max</div>
       </div>
       <label for="picture_title">
         Titre
-        <input type="text" name="title" class="modal_input" placeholder='nom de votre projet - la ville de votre projet'/>
+        <input type="text" name="title" class="modal_input" placeholder='nom de votre projet - la ville de votre projet' required/>
       </label>
       <label for="picture_categorie">
         Catégorie
-        <select name="category" id="categories_select">
+        <select name="category" id="categories_select" required>
           ${catOptions}
         </select>
       </label>
     </form>
   `;
-  let submitAddBtn = `<button type='submit' class="green_btn submit_add_btn">Valider</button>`;
+  let submitAddBtn = `<button id="submit" type='submit' class="green_btn submit_add_btn">Valider</button>`;
   child[0].innerHTML = newBodyTemplate;
   child[1].innerHTML = "Ajout photo";
   child[2].innerHTML = submitAddBtn;
+  let dropZone = document.querySelector('#drop_zone');
+  const imageInput = document.querySelector("#modal_work_picture_input");
+  dropZone.addEventListener('click', function() {
+    imageInput.click();
+  });
   submitAddBtn = document.querySelector(".submit_add_btn");
   submitAddBtn.addEventListener("click", postWork);
+  imageInput.addEventListener("change", () => {
+    let preview = `<img src="" alt="preview_image" class="preview_image">`;
+    dropZone.insertAdjacentHTML("beforeend", preview);
+    preview = document.querySelector(".preview_image");
+    const file = imageInput.files[0];
+    var reader = new FileReader();
+    reader.addEventListener("load", function () {
+      preview.src = reader.result;
+      return imageSrc;
+    });
+    reader.readAsDataURL(file);
+    if (file) {
+      const preview = `<img src="${reader.result}" alt="preview_image" class="preview_image">`;
+      dropZone.insertAdjacentHTML("beforeend", preview);
+    }
+  });
 }
 
 async function postWork(event) {
@@ -314,10 +336,8 @@ async function postWork(event) {
   const form = document.querySelector("form");
   const bearerToken = localStorage.token;
   let formData = new FormData(form);
-  console.log(form.image.files[0]);
   form.addEventListener("change", () => {
     const file = form.image.files[0];
-    console.log(file);
     const preview = `<img src="${form.image.value}" alt="preview_image" class="preview_image">`;
     if (file) {
       document
@@ -333,12 +353,10 @@ async function postWork(event) {
     body: formData,
   });
   let result = await response.json();
-  console.log(result);
 }
 async function deleteWork(event, workIds) {
   let response;
   const bearerToken = localStorage.token;
-  console.log(workIds);
   if (workIds) {
     for (let i = 0; i < workIds.length; i++) {
       response = await fetch(`http://localhost:5678/api/works/${workIds[i]}`, {
@@ -348,7 +366,7 @@ async function deleteWork(event, workIds) {
         },
       });
     }
-  } else if (workIds === null){
+  } else if (workIds === null) {
     const workId = event.target.id.split("-")[1];
     response = await fetch(`http://localhost:5678/api/works/${workId}`, {
       method: "DELETE",
@@ -361,13 +379,12 @@ async function deleteWork(event, workIds) {
 
 async function editEvent(e, data, dataCat) {
   await checkLogin();
-  console.log(data);
   const workIds = data.map((e) => e.id);
   setUpModal(data, e.target);
-  modalIconClose = document.querySelector("#close_modal");
-  blackBg = document.querySelector(".grey-bg");
-  deleteItem = document.querySelectorAll(".modal_icon_delete_btn");
-  deleteAll = document.querySelector("#delete_all_btn");
+  const modalIconClose = document.querySelector("#close_modal");
+  const blackBg = document.querySelector(".grey-bg");
+  const deleteItem = document.querySelectorAll(".modal_icon_delete_btn");
+  const deleteAll = document.querySelector("#delete_all_btn");
   blackBg.addEventListener("click", closeModal);
   modalIconClose.addEventListener("click", closeModal);
   if (e.target.id === "edit_portfolio_title") {
