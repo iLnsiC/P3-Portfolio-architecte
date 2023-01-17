@@ -3,6 +3,9 @@ const worksContainer = document.querySelector(".gallery");
 const works = worksContainer.children;
 const filtersSection = document.querySelector(".filters");
 const liveServerLink = "127.0.0.1:5500/BackEnd/";
+const origin =
+  window.location.href.split(".html")[0].split("/").slice(0, -1).join("/") +
+  "/";
 
 // main const declaration after login
 const logBtn = document.querySelector("#log");
@@ -14,13 +17,24 @@ const editBtnParents = [
 
 // Usefull function in general
 
-// function to add work
-function addWork(picture, title, id, idCat, catName) {
+// fetch functions
+async function fetchWork() {
+  const res = await fetch("http://localhost:5678/api/works");
+  const data = await res.json();
+  return data;
+}
+
+async function fetchCategories() {
+  const res = await fetch("http://localhost:5678/api/categories");
+  const data = await res.json();
+  return data;
+}
+
+function listWorkTemplate(picture, title, id, idCat, catName) {
   const workTitle = title.replaceAll('"', "");
-  const pictureLink = picture.replace("localhost:5678", liveServerLink);
   const workTemplate = `
     <figure id='${id}' data-categorie='${idCat}' data-categorie-name='${catName}' class='work show'>
-      <img src='${pictureLink}' alt='${workTitle}' />
+      <img src='${picture}' alt='${workTitle}' />
       <figcaption>${workTitle}</figcaption>
     </figure>
   `;
@@ -54,7 +68,24 @@ function addFilterButtons() {
     </button>`;
     filtersSection.insertAdjacentHTML("beforeend", filterButtonTemplate);
   });
-  return categories[0];
+}
+
+async function listWorkAction() {
+  document.getElementById("gallery").innerText = "";
+  const data = await fetchWork();
+  data.forEach((e) => {
+    listWorkTemplate(e.imageUrl, e.title, e.id, e.category.id, e.category.name);
+  });
+  if (filtersSection.children.length > 1) {
+    for (let i = 1; i < 4; i++) {
+      filtersSection.children[1].remove();
+    }
+  }
+  addFilterButtons();
+  const filtersButtons = document.querySelectorAll(".filter");
+  for (var i = 0; i < filtersButtons.length; i++) {
+    filtersButtons[i].addEventListener("click", toggleWorks);
+  }
 }
 
 // function to toggle works displays
@@ -79,8 +110,9 @@ function toggleWorks() {
 
 // check login
 async function checkLogin() {
+  let isLog = true;
   let nowTime = new Date();
-  nowTime = nowTime.getTime();
+  nowTime = Date.parse(nowTime);
   const logOffTime = localStorage.logOffTime;
   const logOffMessageTemplate = `
     <div class="modal show">
@@ -92,6 +124,7 @@ async function checkLogin() {
     </div>
   `;
   if (nowTime >= logOffTime) {
+    isLog = false;
     window.scrollTo({
       top: 0,
       left: 0,
@@ -101,17 +134,17 @@ async function checkLogin() {
       .querySelector("body")
       .insertAdjacentHTML("beforeend", logOffMessageTemplate);
     setTimeout(function () {
-      localStorage.removeItem("token");
-      localStorage.removeItem("logOffTime");
-      window.location.replace("http://127.0.0.1:5500/FrontEnd/login.html");
+      logOff();
     }, 5000);
   }
+  return isLog;
 }
 
-function loggOff() {
+function logOff() {
   localStorage.removeItem("token");
   localStorage.removeItem("logOffTime");
-  window.location.replace("http://127.0.0.1:5500/FrontEnd/login.html");
+  localStorage.removeItem("loginTime");
+  window.location.replace(`${origin}login.html`);
 }
 
 // add edit button
@@ -172,6 +205,7 @@ function openModal(title, figure, mainAction, deleteAction, previous, id) {
         .insertAdjacentHTML("beforeend", modalTemplate);
       break;
   }
+  document.querySelector("#previous_modal").style.display = "none";
 }
 
 function setUpModal(data, element) {
@@ -181,20 +215,19 @@ function setUpModal(data, element) {
     case "edit_portfolio_title":
       data.forEach((e) => {
         let workTitle = e.title.replaceAll('"', "");
-        let pictureLink = e.imageUrl.replace("localhost:5678/", liveServerLink);
         figureTemplate =
           figureTemplate +
           `
           <div class='modal_picture'>
             <div class="modal_icon_wrapper">
-              <button id="modal_icon_move_btn-${e.id}" class="modal_icon_move_btn modal_icon">
+              <button id="modal_icon_move_btn-${e.id}" class="modal_icon_move_btn-${e.id} modal_icon">
                 <i class="fas fa-solid fa-up-down-left-right"></i>
               </button>
-              <button id="modal_icon_delete_btn-${e.id}" class="modal_icon_delete_btn modal_icon">
-                <i class="fas fa-solid fa-trash-can"></i>
+              <button id="modal_icon_delete_btn-${e.id}" class="modal_icon_delete_btn-${e.id} modal_icon_delete_btn modal_icon">
+                <i class="modal_icon_delete_btn-${e.id} fas fa-solid fa-trash-can"></i>
               </button>
             </div>
-            <img src="${pictureLink}" alt="${workTitle}" />
+            <img src="${e.imageUrl}" alt="${workTitle}" />
             <button class="single_edit_btn">éditer</button>
           </div>
         `;
@@ -261,6 +294,7 @@ function closeModal() {
 }
 
 async function addWorkModal(child, dataCat) {
+  document.querySelector("#previous_modal").style.display = "block";
   const editActionPicture = "add_work";
   let catId, catName;
   let catOptions = `<option value=""></option>`;
@@ -302,32 +336,30 @@ async function addWorkModal(child, dataCat) {
       </label>
     </form>
   `;
-  let submitAddBtn = `<button id="submit" type='submit' class="green_btn submit_add_btn">Valider</button>`;
+  let submitAddBtn = `<button id="submit" class="green_btn submit_add_btn">Valider</button>`;
   child[0].innerHTML = newBodyTemplate;
   child[1].innerHTML = "Ajout photo";
   child[2].innerHTML = submitAddBtn;
-  let dropZone = document.querySelector('#drop_zone');
+  let dropZone = document.querySelector("#drop_zone");
   const imageInput = document.querySelector("#modal_work_picture_input");
-  dropZone.addEventListener('click', function() {
-    imageInput.click();
-  });
+  // dropZone.addEventListener("click", function () {
+  //   imageInput.click();
+  // });
   submitAddBtn = document.querySelector(".submit_add_btn");
-  submitAddBtn.addEventListener("click", postWork);
+  submitAddBtn.addEventListener("click", function (event) {
+    event.preventDefault();
+    postWork(event);
+  });
   imageInput.addEventListener("change", () => {
     let preview = `<img src="" alt="preview_image" class="preview_image">`;
     dropZone.insertAdjacentHTML("beforeend", preview);
     preview = document.querySelector(".preview_image");
     const file = imageInput.files[0];
-    var reader = new FileReader();
+    var reader = new FileReader(); // constructor
     reader.addEventListener("load", function () {
       preview.src = reader.result;
-      return imageSrc;
     });
     reader.readAsDataURL(file);
-    if (file) {
-      const preview = `<img src="${reader.result}" alt="preview_image" class="preview_image">`;
-      dropZone.insertAdjacentHTML("beforeend", preview);
-    }
   });
 }
 
@@ -336,99 +368,118 @@ async function postWork(event) {
   const form = document.querySelector("form");
   const bearerToken = localStorage.token;
   let formData = new FormData(form);
-  form.addEventListener("change", () => {
-    const file = form.image.files[0];
-    const preview = `<img src="${form.image.value}" alt="preview_image" class="preview_image">`;
-    if (file) {
-      document
-        .querySelector("#drop_zone")
-        .insertAdjacentHTML("beforeend", preview);
-    }
-  });
-  let response = await fetch("http://localhost:5678/api/works", {
+  let res = await fetch("http://localhost:5678/api/works", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${bearerToken}`,
     },
     body: formData,
   });
-  let result = await response.json();
+  if (res.status === 201) {
+    filtersSection.querySelector(".active").classList.remove("active");
+    filtersSection.children[0].classList.add("active");
+    closeModal();
+    listWorkAction();
+  } else {
+    const error = `<h3 id="error">Une erreur s'est produite veuillez ressayer de nouveau</h3>`;
+    form.insertAdjacentHTML("afterbegin", error);
+    form.reset();
+    document.querySelector(".preview_image").replaceWith("");
+  }
 }
 async function deleteWork(event, workIds) {
-  let response;
+  let res;
   const bearerToken = localStorage.token;
   if (workIds) {
     for (let i = 0; i < workIds.length; i++) {
-      response = await fetch(`http://localhost:5678/api/works/${workIds[i]}`, {
+      res = await fetch(`http://localhost:5678/api/works/${workIds[i]}`, {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${bearerToken}`,
         },
       });
     }
+    if (res.status === 204) {
+      filtersSection.querySelector(".active").classList.remove("active");
+      filtersSection.children[0].classList.add("active");
+      closeModal();
+      await listWorkAction();
+    } else {
+      const error = `<h3 id="error">Une erreur s'est produite veuillez ressayer de nouveau</h3>`;
+      document
+        .querySelector("#modal_body")
+        .insertAdjacentHTML("afterbegin", error);
+    }
   } else if (workIds === null) {
-    const workId = event.target.id.split("-")[1];
-    response = await fetch(`http://localhost:5678/api/works/${workId}`, {
+    const workId = event.target.classList[0].split("-")[1];
+    res = await fetch(`http://localhost:5678/api/works/${workId}`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${bearerToken}`,
       },
     });
+    if (res.status === 204) {
+      filtersSection.querySelector(".active").classList.remove("active");
+      filtersSection.children[0].classList.add("active");
+      closeModal();
+      await listWorkAction();
+    } else {
+      const error = `<h3 id="error">Une erreur s'est produite veuillez ressayer de nouveau</h3>`;
+      document
+        .querySelector("#modal_body")
+        .insertAdjacentHTML("afterbegin", error);
+    }
   }
 }
 
 async function editEvent(e, data, dataCat) {
-  await checkLogin();
-  const workIds = data.map((e) => e.id);
-  setUpModal(data, e.target);
-  const modalIconClose = document.querySelector("#close_modal");
-  const blackBg = document.querySelector(".grey-bg");
-  const deleteItem = document.querySelectorAll(".modal_icon_delete_btn");
-  const deleteAll = document.querySelector("#delete_all_btn");
-  blackBg.addEventListener("click", closeModal);
-  modalIconClose.addEventListener("click", closeModal);
-  if (e.target.id === "edit_portfolio_title") {
-    const addBtn = document.querySelector(".add_btn");
-    const modalChild = [
-      document.querySelector("#modal_body"),
-      document.querySelector("#modal_title"),
-      document.querySelector("#modal_actions"),
-    ];
-    addBtn.addEventListener("click", function (event) {
-      addWorkModal(modalChild, dataCat);
-    });
-    deleteItem.forEach((e) => {
-      e.addEventListener("click", function (event) {
-        deleteWork(event, null);
+  const isLog = await checkLogin();
+  if (isLog) {
+    const workIds = data.map((e) => e.id);
+    setUpModal(data, e.target);
+    const modalIconClose = document.querySelector("#close_modal");
+    const blackBg = document.querySelector(".grey-bg");
+    const deleteItem = document.querySelectorAll(".modal_icon_delete_btn");
+    const deleteAll = document.querySelector("#delete_all_btn");
+    blackBg.addEventListener("click", closeModal);
+    modalIconClose.addEventListener("click", closeModal);
+    if (e.target.id === "edit_portfolio_title") {
+      let addBtn = document.querySelector(".add_btn");
+      const modalChild = [
+        document.querySelector("#modal_body"),
+        document.querySelector("#modal_title"),
+        document.querySelector("#modal_actions"),
+      ];
+      addBtn.addEventListener("click", function (event) {
+        event.preventDefault();
+        addWorkModal(modalChild, dataCat);
       });
-    });
-    deleteAll.addEventListener("click", function (event) {
-      deleteWork(event, workIds);
-    });
+      deleteItem.forEach((e) => {
+        e.addEventListener("click", function (event) {
+          event.preventDefault();
+          deleteWork(event, null);
+        });
+      });
+      deleteAll.addEventListener("click", function (event) {
+        event.preventDefault();
+        deleteWork(event, workIds);
+      });
+    }
   }
 }
 
 async function init() {
   const token = localStorage.getItem("token");
-  const res = await fetch("http://localhost:5678/api/works");
-  const data = await res.json();
-  const resCat = await fetch("http://localhost:5678/api/categories");
-  const dataCat = await resCat.json();
-  setTimeout(loggOff, 24 * 60 * 60 * 1000); //on peut rajouter une modal etes vous toujours la pour reset la connexion et le token
-  await data.forEach((e) => {
-    addWork(e.imageUrl, e.title, e.id, e.category.id, e.category.name);
-  });
-  addFilterButtons();
-  const filtersButtons = document.getElementsByClassName("filter");
-  for (var i = 0; i < filtersButtons.length; i++) {
-    filtersButtons[i].addEventListener("click", toggleWorks);
-  }
+  let data = await fetchWork();
+  await listWorkAction();
   if (token) {
-    // logOff
+    setTimeout(logOff, 24 * 60 * 60 * 1000); //on peut rajouter une modal etes vous toujours la pour reset la connexion et le token
+    const dataCat = await fetchCategories();
+    // logOff button
     let navLoginButton = document.querySelector("#log");
     navLoginButton.innerHTML = "<a>logoff</a>";
     navLoginButton = document.querySelector("#log");
-    navLoginButton.addEventListener("click", loggOff);
+    navLoginButton.addEventListener("click", logOff);
 
     // add edit button
     for (var i = 0; i < editBtnParents.length; i++) {
@@ -446,13 +497,16 @@ async function init() {
     let modalIconClose;
     let modalActionBtn;
     let blackBg = document.querySelector(".grey-bg");
-    portfolioEditBtn.addEventListener("click", function (event) {
+    portfolioEditBtn.addEventListener("click", async function (event) {
+      data = await fetchWork();
       editEvent(event, data, dataCat);
     });
-    introEditBtn[0].addEventListener("click", function (event) {
+    introEditBtn[0].addEventListener("click", async function (event) {
+      data = await fetchWork();
       editEvent(event, data);
     });
-    introEditBtn[1].addEventListener("click", function (event) {
+    introEditBtn[1].addEventListener("click", async function (event) {
+      data = await fetchWork();
       editEvent(event, data);
     });
   }
