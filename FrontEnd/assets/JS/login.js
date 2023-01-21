@@ -1,8 +1,5 @@
 const form = document.querySelector("form");
 const errorDom = document.querySelector("#error");
-console.log(
-  window.location.href.split(".html")[0].split("/").slice(0, -1).join("/") + "/"
-);
 async function onSubmit(event) {
   event.preventDefault();
   let user = {
@@ -25,7 +22,6 @@ async function onSubmit(event) {
     localStorage.setItem("token", result.token);
     localStorage.setItem("loginTime", loginTime);
     localStorage.setItem("logOffTime", logOffTime);
-    // je choisi la methode replace() pour ne pas avoir la fenetre Login dans l'historique et eviter que le bouton precedent nous ramene a cette fenetre
     const origin =
       window.location.href.split(".html")[0].split("/").slice(0, -1).join("/") +
       "/";
