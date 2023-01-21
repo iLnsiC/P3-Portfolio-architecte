@@ -56,6 +56,8 @@ function getAllCategories() {
 }
 
 function addFilterButtons() {
+  const allFilterBtn = `<button id="Tout" class="filter active">Tout</button>`;
+  filtersSection.insertAdjacentHTML("beforeend", allFilterBtn);
   const categories = getAllCategories();
   categories[1].forEach((e, i) => {
     const category = e.replace('"', "");
@@ -72,15 +74,11 @@ function addFilterButtons() {
 
 async function listWorkAction() {
   document.getElementById("gallery").innerText = "";
+  filtersSection.innerText = "";
   const data = await fetchWork();
   data.forEach((e) => {
     listWorkTemplate(e.imageUrl, e.title, e.id, e.category.id, e.category.name);
   });
-  if (filtersSection.children.length > 1) {
-    for (let i = 1; i < 4; i++) {
-      filtersSection.children[1].remove();
-    }
-  }
   addFilterButtons();
   const filtersButtons = document.querySelectorAll(".filter");
   for (var i = 0; i < filtersButtons.length; i++) {
@@ -411,6 +409,8 @@ async function deleteWork(event, workIds) {
         .insertAdjacentHTML("afterbegin", error);
     }
   } else if (workIds === null) {
+    const targetId = "#" + event.target.classList[0].toString();
+    const target = document.querySelector(targetId).parentElement.parentElement;
     const workId = event.target.classList[0].split("-")[1];
     res = await fetch(`http://localhost:5678/api/works/${workId}`, {
       method: "DELETE",
@@ -421,8 +421,8 @@ async function deleteWork(event, workIds) {
     if (res.status === 204) {
       filtersSection.querySelector(".active").classList.remove("active");
       filtersSection.children[0].classList.add("active");
-      closeModal();
       await listWorkAction();
+      target.remove();
     } else {
       const error = `<h3 id="error">Une erreur s'est produite veuillez ressayer de nouveau</h3>`;
       document
