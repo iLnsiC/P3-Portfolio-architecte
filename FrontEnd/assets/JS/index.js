@@ -473,11 +473,20 @@ async function init() {
   let data = await fetchWork();
   await listWorkAction();
   if (token) {
+    const loginModeTemplate = `
+    <div class="edit_mode">
+      <i class="fas fa-regular fa-pen-to-square fa-lg"></i>
+      <p>Mode édition</p>
+      <button class="edit_mode_btn">publier les changements</button>
+    </div>`;
+    const header = document.querySelector("header");
+    header.style.marginTop = "70px";
+    header.insertAdjacentHTML("afterbegin", loginModeTemplate);
     setTimeout(logOff, 24 * 60 * 60 * 1000); //on peut rajouter une modal etes vous toujours la pour reset la connexion et le token
     const dataCat = await fetchCategories();
     // logOff button
     let navLoginButton = document.querySelector("#log");
-    navLoginButton.innerHTML = "<a>logoff</a>";
+    navLoginButton.innerHTML = "<a>logout</a>";
     navLoginButton = document.querySelector("#log");
     navLoginButton.addEventListener("click", logOff);
 
@@ -494,9 +503,6 @@ async function init() {
       document.querySelector("#edit_introduction_article"),
       document.querySelector("#edit_introduction_img"),
     ];
-    let modalIconClose;
-    let modalActionBtn;
-    let blackBg = document.querySelector(".grey-bg");
     portfolioEditBtn.addEventListener("click", async function (event) {
       data = await fetchWork();
       editEvent(event, data, dataCat);

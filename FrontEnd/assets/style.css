@@ -378,6 +378,29 @@ footer nav ul {
 }
 
 /* index loggeed */
+.edit_mode {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  color: white;
+  background-color: black;
+  width: 100%;
+  padding: 0.3rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+.edit_mode > * {
+  color: white;
+  background-color: black;
+}
+.edit_mode_btn {
+  background-color: white;
+  color: black;
+  padding: 0.7rem;
+  border-radius: 60px;
+}
 .edit_btn {
   border: none;
   padding: 0 0 1.5rem;
@@ -517,18 +540,18 @@ html,
   border: none;
   border-radius: 60px;
 }
-.show{
+.show {
   display: block !important;
 }
 .modal_profile_picture,
 .modal_picture_input,
-.modal_introduction{
+.modal_introduction {
   width: 100%;
   display: flex;
   flex-direction: column;
 }
 .modal_profile_picture,
-.modal_picture_input{
+.modal_picture_input {
   position: relative;
   justify-content: space-around;
   align-items: center;
@@ -536,27 +559,27 @@ html,
 .modal_profile_picture,
 .modal_picture_input {
   border: none;
-  background: #E8F1F7;
+  background: #e8f1f7;
   border-radius: 3px;
   width: 100%;
   text-align: center;
   height: 250px;
   margin-top: 30px;
 }
-.modal_introduction{
+.modal_introduction {
   gap: 30px;
 }
-.modal_introduction > *{
+.modal_introduction > * {
   border: 1px solid grey;
   padding: 0.3rem;
   border-radius: 10px;
 }
 #drop_label {
   color: #306685;
-  background: #CBD6DC;
+  background: #cbd6dc;
   padding: 1rem 1.5rem;
   border-radius: 50px;
-  cursor:pointer;
+  cursor: pointer;
 }
 #drop_zone input {
   display: none;
@@ -565,19 +588,19 @@ form .fas {
   width: 100%;
   color: #306685;
   font-size: 70px;
-  background-color: #E8F1F7;
+  background-color: #e8f1f7;
 }
-.picture_condition{
+.picture_condition {
   color: #444444;
   background-color: inherit;
 }
-.edit_picture_form{
+.edit_picture_form {
   width: 100%;
   display: flex;
   flex-direction: column;
   gap: 50px;
 }
-.edit_picture_form label { 
+.edit_picture_form label {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -585,19 +608,19 @@ form .fas {
 .edit_picture_form input,
 .edit_picture_form select {
   border: none;
-  background: #FFFFFF;
+  background: #ffffff;
   box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
   font-size: 20px;
   height: 50px;
   padding-left: 1rem;
 }
-.logoff_Title{
+.logoff_Title {
   color: red;
   line-height: 1.5;
   text-align: center;
   margin: auto;
 }
-.preview_image{
+.preview_image {
   position: absolute;
   height: 100%;
   object-fit: contain;
