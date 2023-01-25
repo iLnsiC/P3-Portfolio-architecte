@@ -334,7 +334,7 @@ async function addWorkModal(child, dataCat) {
       </label>
     </form>
   `;
-  let submitAddBtn = `<button id="submit" class="green_btn submit_add_btn">Valider</button>`;
+  let submitAddBtn = `<button id="submit" class="disable green_btn submit_add_btn">Valider</button>`;
   child[0].innerHTML = newBodyTemplate;
   child[1].innerHTML = "Ajout photo";
   child[2].innerHTML = submitAddBtn;
@@ -343,11 +343,44 @@ async function addWorkModal(child, dataCat) {
   // dropZone.addEventListener("click", function () {
   //   imageInput.click();
   // });
+  const form = document.querySelector("form");
+  let formData = new FormData(form);
+  let isFormFull = [false, false, false];
   submitAddBtn = document.querySelector(".submit_add_btn");
+  form.addEventListener("change", function () {
+    formData = new FormData(form);
+    for (const [key, value] of formData) {
+      if (key === "image") {
+        if (value.name === "" || value.name === null) {
+          isFormFull[0] = false;
+        } else {
+          isFormFull[0] = true;
+        }
+      }
+      if (key === "title") {
+        if (value) {
+          isFormFull[1] = true;
+        } else {
+          isFormFull[1] = false;
+        }
+      }
+      if (key === "category") {
+        if (value) {
+          isFormFull[2] = true;
+        } else {
+          isFormFull[2] = false;
+        }
+      }
+    }
+    if (!isFormFull.includes(false)) {
+      submitAddBtn.classList.remove("disable");
+    }
+  });
   submitAddBtn.addEventListener("click", function (event) {
     event.preventDefault();
     postWork(event);
   });
+
   imageInput.addEventListener("change", () => {
     let preview = `<img src="" alt="preview_image" class="preview_image">`;
     dropZone.insertAdjacentHTML("beforeend", preview);

@@ -628,3 +628,10 @@ form .fas {
   margin: 0 !important;
   top: 0;
 }
+.disable {
+  background-color: #a7a7a7 !important;
+}
+.disable:hover,
+.disable:focus {
+  background-color: #a7a7a7 !important;
+}
