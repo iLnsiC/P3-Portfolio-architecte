@@ -344,7 +344,7 @@ async function addWorkModal(child, dataCat) {
   //   imageInput.click();
   // });
   const form = document.querySelector("form");
-  let formData = new FormData(form);
+  let formData;
   let isFormFull = [false, false, false];
   submitAddBtn = document.querySelector(".submit_add_btn");
   form.addEventListener("change", function () {
@@ -374,6 +374,8 @@ async function addWorkModal(child, dataCat) {
     }
     if (!isFormFull.includes(false)) {
       submitAddBtn.classList.remove("disable");
+    } else {
+      submitAddBtn.classList.add("disable");
     }
   });
   submitAddBtn.addEventListener("click", function (event) {
